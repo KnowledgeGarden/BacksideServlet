@@ -343,11 +343,11 @@ public abstract class BaseHandler {
 	}
 	
 	public JSONObject jsonFromString(String jsonString) throws ServletException {
-//		System.out.println("JSONFROMSTRING "+jsonString);
 		JSONParser p = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
 		try {
 			return (JSONObject)p.parse(jsonString);
 		} catch (Exception e) {
+			environment.logError(jsonString, e);
 			throw new ServletException(e);
 		}
 	}

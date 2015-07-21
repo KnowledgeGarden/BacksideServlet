@@ -25,11 +25,11 @@ public interface IUserSchema {
 			+ "email VARCHAR(255) PRIMARY KEY,"
 			+ "pwd VARCHAR(128) NOT NULL,"
 			+ "name VARCHAR(128) NOT NULL,"
-			+ "fullName VARCHAR(128) NOT NULL,"
+			+ "fullName VARCHAR(128) NOT NULL)",
 			//a rule can be a list of roles, each a short string
 			//the first role is usually the primary role, e.g. USER_ROLE from ISecurity
-			+ "role VARCHAR(255),"
-			+ "avatar VARCHAR(128))",
+		//	+ "role VARCHAR(255),"
+		//	+ "avatar VARCHAR(128))",
 			"CREATE TABLE userprops ("
 			+ "name VARCHAR(255) NOT NULL,"
 			+ "prop VARCHAR(16) NOT NULL,"
@@ -56,7 +56,7 @@ public interface IUserSchema {
 	public static final String updateUserProperty =
 			"UPDATE userprops  SET val=? WHERE prop=? AND name=?";
 	public static final String putUser =
-			"INSERT INTO users values(?, ?, ?, ?, ?, ?)";
+			"INSERT INTO users values(?, ?, ?, ?)";
 	public static final String putUserProperty=
 			"INSERT INTO userprops values(?,?,?)";
 	

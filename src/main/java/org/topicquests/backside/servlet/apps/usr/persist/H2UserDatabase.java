@@ -98,10 +98,10 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 			if (rs.next()) {
 				String key,val,ava,name;
 				ITicket t = new TicketPojo();
-				ava = rs.getString(IUserSchema.USER_AVATAR);
+		//		ava = rs.getString(IUserSchema.USER_AVATAR);
 				name = rs.getString(IUserSchema.USER_NAME);
-				if (!ava.equals(""))
-					t.addAvatarLocator(ava);
+	//			if (!ava.equals(""))
+	//				t.addAvatarLocator(ava);
 				t.setUserLocator(name);
 				t.setProperty(IUserSchema.USER_EMAIL, rs.getString(IUserSchema.USER_EMAIL));
 				t.setProperty(IUserSchema.USER_FULLNAME, rs.getString(IUserSchema.USER_FULLNAME));
@@ -148,12 +148,12 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 				String key,val,ava;
 				String email = rs.getString(IUserSchema.USER_EMAIL);
 				ITicket t = new TicketPojo();
-				ava = rs.getString(IUserSchema.USER_AVATAR);
-				if (!ava.equals(""))
-					t.addAvatarLocator(ava);
+			//	ava = rs.getString(IUserSchema.USER_AVATAR);
+			//	if (!ava.equals(""))
+			//		t.addAvatarLocator(ava);
 				t.setUserLocator(rs.getString(IUserSchema.USER_NAME));
 				t.setProperty(IUserSchema.USER_EMAIL, email);
-				t.setProperty(IUserSchema.USER_ROLE, rs.getString(IUserSchema.USER_ROLE));
+			//	t.setProperty(IUserSchema.USER_ROLE, rs.getString(IUserSchema.USER_ROLE));
 				t.setProperty(IUserSchema.USER_FULLNAME, rs.getString(IUserSchema.USER_FULLNAME));
 				s2 = con.prepareStatement(IUserSchema.getUserProperties);
 				s2.setString(1, userName);
@@ -195,12 +195,12 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 				String key,val,ava;
 				String userName = rs.getString(IUserSchema.USER_NAME);
 				ITicket t = new TicketPojo();
-				ava = rs.getString(IUserSchema.USER_AVATAR);
-				if (!ava.equals(""))
-					t.addAvatarLocator(ava);
+		//		ava = rs.getString(IUserSchema.USER_AVATAR);
+		//		if (!ava.equals(""))
+		//			t.addAvatarLocator(ava);
 				t.setUserLocator(rs.getString(IUserSchema.USER_NAME));
 				t.setProperty(IUserSchema.USER_EMAIL, email);
-				t.setProperty(IUserSchema.USER_ROLE, rs.getString(IUserSchema.USER_ROLE));
+		//		t.setProperty(IUserSchema.USER_ROLE, rs.getString(IUserSchema.USER_ROLE));
 				t.setProperty(IUserSchema.USER_FULLNAME, rs.getString(IUserSchema.USER_FULLNAME));
 				s2 = con.prepareStatement(IUserSchema.getUserProperties);
 				s2.setString(1, userName);
@@ -224,7 +224,8 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 			if (rs2 != null)
 				closeResultSet(rs2,result);
 		}
-		return result;	}
+		return result;	
+	}
 
 
 	/* (non-Javadoc)
@@ -243,8 +244,8 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 			s.setString(2, pwd);
 			s.setString(3, userName);
 			s.setString(4, userFullName);
-			s.setString(5, role);
-			s.setString(6, avatar);
+		//	s.setString(5, "");
+		//	s.setString(6, "");
 			boolean x = s.execute();
 			System.out.println("INSERTUSER1 "+x);
 			s2 = con.prepareStatement(IUserSchema.putUserProperty);
@@ -258,6 +259,17 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 			s2.setString(2, IUserSchema.USER_GEOLOC);
 			s2.setString(3, geolocation);
 			x = s2.execute();
+			s2.clearParameters();
+			s2.setString(1, userName);
+			s2.setString(2, IUserSchema.USER_ROLE);
+			s2.setString(3, role);
+			x = s2.execute();
+			s2.clearParameters();
+			s2.setString(1, userName);
+			s2.setString(2, IUserSchema.USER_AVATAR);
+			s2.setString(3, avatar);
+			x = s2.execute();
+
 			System.out.println("INSERTUSER3 "+x);
 		} catch (Exception e) {
 			environment.logError(e.getMessage(), e);
@@ -404,7 +416,8 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 	 */
 	@Override
 	public IResult updateUserRole(Connection con, String userName, String newRole) {
-		IResult result = new ResultPojo();
+		return updateUserData(con, userName, IUserSchema.USER_ROLE, newRole);
+/*		IResult result = new ResultPojo();
 		PreparedStatement s = null;
 		try {
 			s = con.prepareStatement(IUserSchema.updateUserRole);
@@ -417,7 +430,7 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 		} finally {
 			closePreparedStatement(s,result);
 		}
-		return result;
+		return result; */
 	}
 	@Override
 	public IResult updateUserEmail(Connection con, String userName,
