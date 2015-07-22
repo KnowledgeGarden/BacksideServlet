@@ -4,6 +4,7 @@
 package org.topicquests.backside.servlet.apps.base;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,21 +20,25 @@ import org.topicquests.backside.servlet.ServletEnvironment;
  */
 public class BaseServlet extends HttpServlet {
 	private ServletEnvironment environment;
-	private AppHandler handler;
+	//private AppHandler handler;
     
 	public BaseServlet(ServletEnvironment env, String basePath) {
 		environment = env;
-		handler = new AppHandler(environment,basePath);
+		//handler = new AppHandler(environment,basePath);
 	}
 	
 	
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		handler.executePost(request, response);
+		//handler.executePost(request, response);
 	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		handler.executeGet(request, response);
+		//handler.executeGet(request, response);
+		response.setContentType("text/html; charset=UTF-8");
+        PrintWriter out = response.getWriter();
+    	out.write("<h1>Wrong!</h1>");
+    	out.close();
 	}
 
     public void destroy() {
