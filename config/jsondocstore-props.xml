@@ -20,7 +20,7 @@
 	
 	<!-- Multiple entries possible for clusters -->
 	<list name="Clusters">
-		<parameter name="localhost" value="9600" /> 
+		<parameter name="localhost" value="9300" /> 
 	</list>
 
 	<!-- Index must be lowercase

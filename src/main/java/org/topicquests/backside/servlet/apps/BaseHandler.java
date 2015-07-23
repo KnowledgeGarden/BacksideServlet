@@ -111,9 +111,12 @@ public abstract class BaseHandler {
 		ITicket t = guestCredentials; //default
 		String pt = getPath(request);
 		//seeing things like auth/{....}
-		int where = pt.indexOf('/');
-		if (where > -1)  {
-			pt = pt.substring(where+1);
+		System.out.println("PR "+pt);
+		if (!pt.startsWith("{")) {
+			int where = pt.indexOf('/');
+			if (where > -1)  {
+				pt = pt.substring(where+1);
+			}
 		}
 		JSONObject jo = jsonFromString(pt);
 		result.setResultObjectA(jo);
@@ -342,6 +345,12 @@ public abstract class BaseHandler {
 		return new JSONObject();
 	}
 	
+	/**
+	 * Convert <code>jsonString</code> to a {@link JSONObject}
+	 * @param jsonString
+	 * @return
+	 * @throws ServletException
+	 */
 	public JSONObject jsonFromString(String jsonString) throws ServletException {
 		JSONParser p = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
 		try {

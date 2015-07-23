@@ -503,12 +503,12 @@ public class H2UserDatabase  extends H2DatabaseDriver implements IUserPersist, I
 			while (rs.next()) {
 				t = new TicketPojo();
 				name = rs.getString(IUserSchema.USER_NAME);
-				ava = rs.getString(IUserSchema.USER_AVATAR);
-				if (!ava.equals(""))
-					t.addAvatarLocator(ava);;
+			//	ava = rs.getString(IUserSchema.USER_AVATAR);
+			//	if (!ava.equals(""))
+			//		t.addAvatarLocator(ava);;
 				t.setUserLocator(name);
 				t.setProperty(IUserSchema.USER_EMAIL, rs.getString(IUserSchema.USER_EMAIL));
-				t.setProperty(IUserSchema.USER_ROLE, rs.getString(IUserSchema.USER_ROLE));
+				//t.setProperty(IUserSchema.USER_ROLE, rs.getString(IUserSchema.USER_ROLE));
 				t.setProperty(IUserSchema.USER_FULLNAME, rs.getString(IUserSchema.USER_FULLNAME));
 				s2 = con.prepareStatement(IUserSchema.getUserProperties);
 				s2.setString(1, name);

@@ -11,7 +11,14 @@ import org.topicquests.backside.servlet.apps.usr.api.IUserModel;
 import org.topicquests.backside.servlet.apps.usr.api.IUserPersist;
 import org.topicquests.backside.servlet.apps.usr.persist.H2UserDatabase;
 import org.topicquests.common.ResultPojo;
+import org.topicquests.common.api.ICoreIcons;
 import org.topicquests.common.api.IResult;
+import org.topicquests.common.api.ITopicQuestsOntology;
+import org.topicquests.model.api.ITicket;
+import org.topicquests.model.api.node.INode;
+import org.topicquests.model.api.node.INodeModel;
+import org.topicquests.model.api.provider.ITopicDataProvider;
+import org.topicquests.topicmap.json.model.JSONTopicmapEnvironment;
 
 import com.google.common.io.BaseEncoding;
 
@@ -22,6 +29,8 @@ import com.google.common.io.BaseEncoding;
 public class UserModel implements IUserModel {
 	private ServletEnvironment environment;
 	private IUserPersist database;
+	private ITopicDataProvider topicMap;
+	private INodeModel nodeModel;
     /**
      * Pools Connections for each local thread
      * Must be closed when the thread terminates
@@ -38,6 +47,10 @@ public class UserModel implements IUserModel {
 		String userPwd=environment.getStringProperty("MyDatabasePwd");
 		String dbPath = environment.getStringProperty("UserDatabasePath");
 		database = new H2UserDatabase(environment,dbName,userName,userPwd,dbPath);
+		JSONTopicmapEnvironment tmenv = environment.getTopicMapEnvironment();
+		System.out.println("FOO "+tmenv);
+		topicMap = (ITopicDataProvider)tmenv.getDataProvider();
+		nodeModel = topicMap.getNodeModel();
 		validateDefaultAdmin();
 	}
 
@@ -48,7 +61,10 @@ public class UserModel implements IUserModel {
 		System.out.println("VALIDATE "+admin+" | "+pwd);
 		IResult r = authenticate(admin,pwd);
 		if (r.getResultObject() == null) {
-			r = this.insertUser(admin, "defaultadmin", pwd, "Default Admin", "", ISecurity.ADMINISTRATOR_ROLE, "", "");
+			r = this.insertUser(admin, "defaultadmin", pwd, "Default Admin", "", ISecurity.ADMINISTRATOR_ROLE, "", "", false);
+			//This user is far more than an Admin
+			StringBuilder buf = new StringBuilder(ISecurity.ADMINISTRATOR_ROLE).append(", ").append(ISecurity.OWNER_ROLE);
+			r = this.updateUserRole("defaultadmin", buf.toString());
 		}
 	}
 	/* (non-Javadoc)
@@ -91,17 +107,29 @@ public class UserModel implements IUserModel {
 	 * @see org.topicquests.backside.servlet.apps.usr.api.IUserModel#insertUser(java.lang.String, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public IResult insertUser(String email, String userName, String password, String userFullName, String avatar, String role, String homepage, String geolocation) {
+	public IResult insertUser(String email, String userName, String password, String userFullName, String avatar, String role, String homepage, String geolocation, boolean addTopic) {
 		Connection con = null;
 		IResult r = getMapConnection();
 		if (r.hasError())
 			return r;
 		con = (Connection)r.getResultObject();
-		System.out.println("INSERTUSER "+con);
+//		System.out.println("INSERTUSER "+con);
 		
-		System.out.println("INSERTUSER "+password);
-
-		return database.insertUser(con, email, userName, password, userFullName, avatar, role, homepage, geolocation);
+//		System.out.println("INSERTUSER "+password);
+		IResult result = new ResultPojo();
+		if (addTopic) {
+			String s = userFullName;
+			if (s.equals(""))
+				s = userName;
+			INode n = nodeModel.newInstanceNode(userName, ITopicQuestsOntology.USER_TYPE, s, "", "en", 
+					ITopicQuestsOntology.SYSTEM_USER, ICoreIcons.PERSON_ICON_SM, ICoreIcons.PERSON_ICON, false);
+			result = topicMap.putNode(n, false);
+		}
+		IResult x = database.insertUser(con, email, userName, password, userFullName, avatar, role, homepage, geolocation);
+		if (x.hasError())
+			result.addErrorString(x.getErrorString());
+		result.setResultObject(x.getResultObject());
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -273,6 +301,13 @@ public class UserModel implements IUserModel {
 	@Override
 	public void shutDown() {
 		closeLocalConnection();
+	}
+
+	@Override
+	public IResult listUserTopics(int start, int count, ITicket credentials) {
+		IResult result = new ResultPojo();
+		// TODO Auto-generated method stub
+		return result;
 	}
 
 

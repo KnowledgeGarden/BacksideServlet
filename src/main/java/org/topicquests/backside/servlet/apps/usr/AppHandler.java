@@ -130,7 +130,7 @@ public class AppHandler  extends BaseHandler {
 				role = ISecurity.USER_ROLE; //default role
 			byte [] foo = BaseEncoding.base64().decode(password);
 			String creds = new String(foo);
-			r = model.insertUser(email, userName, creds, fullName, avatar, role, homepage, geolocation);
+			r = model.insertUser(email, userName, creds, fullName, avatar, role, homepage, geolocation, true);
 			System.out.println("NEWUSER2 "+r.getErrorString());
 			if (r.hasError()) {
 				code = BaseHandler.RESPONSE_INTERNAL_SERVER_ERROR;

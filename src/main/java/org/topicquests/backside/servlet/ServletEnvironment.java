@@ -38,8 +38,8 @@ public class ServletEnvironment {
 		cache = new CredentialCache(this);
 		//TODO build topicmap
 		stats = new StatisticsUtility();
+		tmEnvironment = new JSONTopicmapEnvironment(stats);
 		userModel = new UserModel(this);
-	//	tmEnvironment = new JSONTopicmapEnvironment(stats);
 		isShutDown = false;
 		System.out.println("ServletEnvironment+");
 	}

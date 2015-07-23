@@ -4,6 +4,7 @@
 package org.topicquests.backside.servlet.apps.usr.api;
 
 import org.topicquests.common.api.IResult;
+import org.topicquests.model.api.ITicket;
 import org.topicquests.backside.servlet.api.ISecurity;
 /**
  * @author park
@@ -34,19 +35,22 @@ public interface IUserModel {
      * Throws an exception if user already exists. Should
      * use <code>existsUsername</code> first
      * </p>
-     * @param email TODO
+     * @param email 
      * @param userName
      * @param password
-     * @param userFullName TODO
-     * @param avatar TODO
+     * @param userFullName 
+     * @param avatar 
      * @param role based on {@link ISecurity} roles
-     * @param homepage TODO
-     * @param geolocation TODO
+     * @param homepage 
+     * @param geolocation 
+     * @param addTopic <code>false</code> only for default administrator
      * @return
      */
     IResult insertUser(String email,
     				  String userName,
-    				  String password, String userFullName, String avatar, String role, String homepage, String geolocation);
+    				  String password, String userFullName, 
+    				  String avatar, String role, String homepage, 
+    				  String geolocation, boolean addTopic);
     
     /**
      * Used when importing from an XML export
@@ -102,7 +106,23 @@ public interface IUserModel {
      */
     IResult listUserLocators();
     
+    /**
+     * List users from the user database
+     * @param start
+     * @param count
+     * @return
+     */
     IResult listUsers(int start, int count);
+    
+    /**
+     * List users in the TopicMap
+     * @param start
+     * @param count
+     * @param credentials
+     * @return
+     */
+    IResult listUserTopics(int start, int count, ITicket credentials);
+    
     
     void shutDown();
 }

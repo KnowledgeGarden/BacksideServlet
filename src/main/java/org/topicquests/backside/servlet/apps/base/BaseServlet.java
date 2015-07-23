@@ -15,26 +15,23 @@ import org.topicquests.backside.servlet.ServletEnvironment;
 
 /**
  * @author park
- * <p>Provide WebServices for Node.js Clients</p>
- * <p>Only needs to respond to JSON Queries with JSON responses</p>
+ * <p>A 404 default servlet</p>
  */
 public class BaseServlet extends HttpServlet {
 	private ServletEnvironment environment;
-	//private AppHandler handler;
     
 	public BaseServlet(ServletEnvironment env, String basePath) {
 		environment = env;
-		//handler = new AppHandler(environment,basePath);
 	}
 	
 	
 	
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//handler.executePost(request, response);
+		//IGNORE
 	}
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//handler.executeGet(request, response);
+		//This is really a 404 servlet: if some browser does a GET here, we respond thus
 		response.setContentType("text/html; charset=UTF-8");
         PrintWriter out = response.getWriter();
     	out.write("<h1>Wrong!</h1>");

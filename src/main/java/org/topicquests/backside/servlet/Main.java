@@ -17,6 +17,7 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.topicquests.backside.servlet.apps.admin.AdminServlet;
+import org.topicquests.backside.servlet.apps.administrator.AdministratorServlet;
 import org.topicquests.backside.servlet.apps.auth.AuthenticationServlet;
 import org.topicquests.backside.servlet.apps.base.BaseServlet;
 import org.topicquests.backside.servlet.apps.tm.TopicMapServlet;
@@ -81,6 +82,7 @@ public class Main {
         //   it should go last
 		//////////////////////
         context.addServlet(new ServletHolder(new AdminServlet(environment, basePath)),"/admin/*");
+        context.addServlet(new ServletHolder(new AdministratorServlet(environment, basePath)),"/administrator/*");
         context.addServlet(new ServletHolder(new AuthenticationServlet(environment, basePath)),"/auth/*");
         context.addServlet(new ServletHolder(new UserServlet(environment, basePath)),"/user/*");
         context.addServlet(new ServletHolder(new TopicMapServlet(environment, basePath)), "/tm/*");

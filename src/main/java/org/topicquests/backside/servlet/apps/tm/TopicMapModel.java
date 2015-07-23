@@ -67,4 +67,24 @@ public class TopicMapModel implements ITopicMapModel {
 		
 	}
 
+	@Override
+	public IResult listSubclassTopics(String superClassLocator,
+			ITicket credentials) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IResult listInstanceTopics(String typeLocator, ITicket credentials) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IResult listTopicsByKeyValue(String propertyKey, String value,
+			ITicket credentials) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
