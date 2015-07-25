@@ -114,14 +114,6 @@ public interface IUserModel {
      */
     IResult listUsers(int start, int count);
     
-    /**
-     * List users in the TopicMap
-     * @param start
-     * @param count
-     * @param credentials
-     * @return
-     */
-    IResult listUserTopics(int start, int count, ITicket credentials);
     
     
     void shutDown();

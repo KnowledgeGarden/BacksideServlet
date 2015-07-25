@@ -7,8 +7,14 @@ import net.minidev.json.JSONObject;
 
 import org.topicquests.backside.servlet.ServletEnvironment;
 import org.topicquests.backside.servlet.apps.tm.api.ITopicMapModel;
+import org.topicquests.common.ResultPojo;
 import org.topicquests.common.api.IResult;
+import org.topicquests.common.api.ITopicQuestsOntology;
+import org.topicquests.model.Node;
 import org.topicquests.model.api.ITicket;
+import org.topicquests.model.api.node.INode;
+import org.topicquests.model.api.provider.ITopicDataProvider;
+import org.topicquests.topicmap.json.model.JSONTopicmapEnvironment;
 
 /**
  * @author park
@@ -16,22 +22,26 @@ import org.topicquests.model.api.ITicket;
  */
 public class TopicMapModel implements ITopicMapModel {
 	private ServletEnvironment environment;
+	private JSONTopicmapEnvironment tmEnvironment;
+	private ITopicDataProvider topicMap;
 
 	/**
 	 * 
 	 */
 	public TopicMapModel(ServletEnvironment env) {
 		environment = env;
-		//TODO access to the topic map
+		tmEnvironment = environment.getTopicMapEnvironment();
+		topicMap = (ITopicDataProvider)tmEnvironment.getDataProvider();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.topicquests.backside.servlet.apps.tm.api.ITopicMapModel#putTopic(net.minidev.json.JSONObject, org.topicquests.model.api.ITicket)
 	 */
 	@Override
-	public IResult putTopic(JSONObject topic, ITicket credentials) {
-		// TODO Auto-generated method stub
-		return null;
+	public IResult putTopic(JSONObject topic, boolean checkVersion) {
+		INode n = new Node(topic);
+		IResult result = topicMap.putNode(n, checkVersion);
+		return result;
 	}
 
 	/* (non-Javadoc)
@@ -39,8 +49,7 @@ public class TopicMapModel implements ITopicMapModel {
 	 */
 	@Override
 	public IResult getTopic(String topicLocator, ITicket credentials) {
-		// TODO Auto-generated method stub
-		return null;
+		return topicMap.getNode(topicLocator, credentials);
 	}
 
 	/* (non-Javadoc)
@@ -48,17 +57,16 @@ public class TopicMapModel implements ITopicMapModel {
 	 */
 	@Override
 	public IResult removeTopic(String topicLocator, ITicket credentials) {
-		// TODO Auto-generated method stub
-		return null;
+		return topicMap.removeNode(topicLocator, credentials);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.topicquests.backside.servlet.apps.tm.api.ITopicMapModel#query(net.minidev.json.JSONObject, org.topicquests.model.api.ITicket)
 	 */
 	@Override
-	public IResult query(JSONObject query, ITicket credentials) {
-		// TODO Auto-generated method stub
-		return null;
+	public IResult query(JSONObject query, int start, int count, ITicket credentials) {
+		IResult result = topicMap.runQuery(query.toJSONString(), start, count, credentials);
+		return result;
 	}
 
 	@Override
@@ -69,22 +77,28 @@ public class TopicMapModel implements ITopicMapModel {
 
 	@Override
 	public IResult listSubclassTopics(String superClassLocator,
-			ITicket credentials) {
-		// TODO Auto-generated method stub
-		return null;
+			int start, int count, ITicket credentials) {
+		IResult result = topicMap.listSubclassNodes(superClassLocator, start, count, credentials);
+		return result;
 	}
 
 	@Override
-	public IResult listInstanceTopics(String typeLocator, ITicket credentials) {
-		// TODO Auto-generated method stub
-		return null;
+	public IResult listInstanceTopics(String typeLocator, int start, int count, ITicket credentials) {
+		IResult result = topicMap.listInstanceNodes(typeLocator, start, count, credentials);
+		return result;
 	}
 
 	@Override
 	public IResult listTopicsByKeyValue(String propertyKey, String value,
-			ITicket credentials) {
-		// TODO Auto-generated method stub
-		return null;
+			int start, int count, ITicket credentials) {
+		IResult result = null; //
+		return result;
+	}
+
+	@Override
+	public IResult listUserTopics(int start, int count, ITicket credentials) {
+		IResult result = topicMap.listInstanceNodes(ITopicQuestsOntology.USER_TYPE, start, count, credentials);
+		return result;
 	}
 
 }

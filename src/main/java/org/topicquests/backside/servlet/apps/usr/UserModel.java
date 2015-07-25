@@ -303,12 +303,6 @@ public class UserModel implements IUserModel {
 		closeLocalConnection();
 	}
 
-	@Override
-	public IResult listUserTopics(int start, int count, ITicket credentials) {
-		IResult result = new ResultPojo();
-		// TODO Auto-generated method stub
-		return result;
-	}
 
 
 
