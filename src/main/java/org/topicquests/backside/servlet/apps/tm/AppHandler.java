@@ -18,6 +18,7 @@ import org.topicquests.backside.servlet.ServletEnvironment;
 import org.topicquests.backside.servlet.api.ICredentialsMicroformat;
 import org.topicquests.backside.servlet.api.IErrorMessages;
 import org.topicquests.backside.servlet.apps.BaseHandler;
+import org.topicquests.backside.servlet.apps.admin.api.IAdminMicroformat;
 import org.topicquests.backside.servlet.apps.tm.api.ITopicMapMicroformat;
 import org.topicquests.backside.servlet.apps.tm.api.ITopicMapModel;
 import org.topicquests.backside.servlet.apps.usr.api.IUserMicroformat;
@@ -103,8 +104,51 @@ public class AppHandler  extends BaseHandler {
 	
 	
 	public void handlePost(HttpServletRequest request, HttpServletResponse response, ITicket credentials, JSONObject jsonObject) throws ServletException, IOException {
-		//TODO
-	}
+		JSONObject returnMessage = newJSONObject();
+		String message = "", rtoken="";
+		String verb = (String)jsonObject.get(ICredentialsMicroformat.VERB);
+		int code = 0;
+		IResult r;
+		if (verb.equals(ITopicMapMicroformat.PUT_TOPIC)) {
+			//TODO
+		} else if (verb.equals(ITopicMapMicroformat.NEW_INSTANCE_TOPIC)) {
+			JSONObject theTopic = (JSONObject)jsonObject.get(ICredentialsMicroformat.CARGO);
+			if (theTopic != null) {
+				r = model.newInstanceNode(theTopic);
+				returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)r.getResultObject());
+				code = BaseHandler.RESPONSE_OK;
+				message = "ok";
+			} else {
+				String x = IErrorMessages.MISSING_TOPIC+"-TMServletPost-"+verb;
+				environment.logError(x, null);
+				throw new ServletException(x);
+			}
+		} else if (verb.equals(ITopicMapMicroformat.NEW_SUBCLASS_TOPIC)) {
+			JSONObject theTopic = (JSONObject)jsonObject.get(ICredentialsMicroformat.CARGO);
+			if (theTopic != null) {
+				r = model.newSubclassNode(theTopic);
+				returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)r.getResultObject());
+				code = BaseHandler.RESPONSE_OK;
+				message = "ok";
+			} else {
+				String x = IErrorMessages.MISSING_TOPIC+"-TMServletPost-"+verb;
+				environment.logError(x, null);
+				throw new ServletException(x);
+			}
+		} else if (verb.equals(ITopicMapMicroformat.REMOVE_TOPIC)) {
+			//TODO
+	//	} else if (verb.equals(ITopicMapMicroformat.PUT_TOPIC)) {
+			
+			
+		} else {
+			String x = IErrorMessages.BAD_VERB+"-AdminServletPost-"+verb;
+			environment.logError(x, null);
+			throw new ServletException(x);
+		}
+		returnMessage.put(ICredentialsMicroformat.RESP_TOKEN, rtoken);
+		returnMessage.put(ICredentialsMicroformat.RESP_MESSAGE, message);
+		super.sendJSON(returnMessage.toJSONString(), code, response);
+		returnMessage = null;	}
 	
 	public void shutDown() {
 		model.shutDown();

@@ -46,6 +46,16 @@ public interface ITopicMapModel {
 	
 	IResult listTopicsByKeyValue(String propertyKey, String value, int start, int count, ITicket credentials);
 	
+	/**
+	 * Allow for a simple shell topic, crafted at web clients, to be filled out to a full topic and persisted
+	 * and returned.
+	 * @param theTopicShell
+	 * @return returns the node's JSONObject
+	 */
+	IResult newInstanceNode(JSONObject theTopicShell);
+	
+	IResult newSubclassNode(JSONObject theTopicShell);
+	
     /**
      * List users in the TopicMap
      * @param start

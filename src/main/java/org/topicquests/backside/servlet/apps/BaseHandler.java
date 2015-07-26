@@ -112,6 +112,10 @@ public abstract class BaseHandler {
 		String pt = getPath(request);
 		//seeing things like auth/{....}
 		System.out.println("PR "+pt);
+		//PR {"verb":"PutTopic","uIP":"173.164.129.250","uName":"jackpark","cargo":{"uName
+		//":"jackpark","Lang":"en","Label":"My test topic","Details":"Created to test the
+		//AngularApp code","LiP":"/images/cogwheel.png","SiP":"/images/cogwheel.sm.png","I
+		//sPvt":"F","SType":"ClassType"}}
 		if (!pt.startsWith("{")) {
 			int where = pt.indexOf('/');
 			if (where > -1)  {
@@ -139,7 +143,9 @@ public abstract class BaseHandler {
 			if (token.equals(IAuthMicroformat.AUTHENTICATE)) {
 				//CASE; user is authenticating, just pass through guest credentials
 			} else {
-				//TODO for now, we will just let things pass through with default credentials
+				//TODO ?
+				//String userId = (String)jo.get(ICredentialsMicroformat.USER_NAME);
+				
 			}
 		}
 		result.setResultObject(t);
@@ -237,7 +243,12 @@ public abstract class BaseHandler {
     public String getQueryString(HttpServletRequest request) {
     	return notNullString(request.getQueryString());
     }
-
+//////////////////////////////////////
+//    SENDJSON 0 {"rMsg":"","rToken":"","cargo":{"crDt":"2015-07-25T18:30:56-07:00","t
+//    	rCl":["ClassType"],"crtr":"jackpark","lox":"37cbbf86-6861-43c0-85e7-facc95d2cf1e
+//    	","sIco":"\/images\/cogwheel.sm.png","isPrv":"false","_ver":"1437874256133","lEd
+//    	Dt":"2015-07-25T18:30:56-07:00","details":["Created to test the AngularApp code"
+//    	],"label":["My test topic"],"lIco":"\/images\/cogwheel.png","inOf":"ClassType"}}
     /**
      * Ship JSON string out to the client
      * @param json
@@ -250,6 +261,7 @@ public abstract class BaseHandler {
     	try {
 	    	response.setContentType("application/json; charset=UTF-8");
 	    	response.setStatus(statusCode);
+	    	//TODO: URL must come from a config file
 	    	response.setHeader(" Access-Control-Allow-Origin", "http://localhost:8080/");
 	    //	System.out.println("RESPONSE "+response.getContentType()+" "+response.getCharacterEncoding()+" "+statusCode);
 	    //	System.out.println(json);
