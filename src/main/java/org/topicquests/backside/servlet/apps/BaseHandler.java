@@ -80,6 +80,8 @@ public abstract class BaseHandler {
 		guestCredentials = new TicketPojo();
 		guestCredentials.setUserLocator(ITopicQuestsOntology.GUEST_USER);
 		credentialCache = environment.getCredentialCache();
+		//caller MUST send in "guest" as token if not authenticated
+		credentialCache.putTicket(ITopicQuestsOntology.GUEST_USER, guestCredentials);
 	}
 
 	///////////////////////////////////////////////////////////////////
@@ -126,27 +128,19 @@ public abstract class BaseHandler {
 		result.setResultObjectA(jo);
 		String x = (String)jo.get(ICredentialsMicroformat.USER_IP);
 		System.out.println("GET IP "+x);
-		//first, test for a token
-		String token = (String)jo.get(ICredentialsMicroformat.SESSION_TOKEN);
-		if (token != null) {
-			t = credentialCache.getTicket(token);
-			if (t == null) {
-				x = IErrorMessages.TOKEN_NO_USER+token;
-				//CASE: someone sent in a token, but we don't know who it is: big error
-				// could be that the same platform logged out before
-				environment.logError(x, null);
-				throw new ServletException(x);
+		String verb = (String)jo.get(ICredentialsMicroformat.VERB);
+		if (!verb.equals(IAuthMicroformat.AUTHENTICATE)) {
+			String token = (String)jo.get(ICredentialsMicroformat.SESSION_TOKEN);
+			if (token != null) {
+				t = credentialCache.getTicket(token);
+				if (t == null) {
+					x = IErrorMessages.TOKEN_NO_USER+token;
+					//CASE: someone sent in a token, but we don't know who it is: big error
+					// could be that the same platform logged out before
+					environment.logError(x, null);
+					throw new ServletException(x);
+				} 
 			} 
-		} else {
-			//see if this is an authenticate
-			token = (String)jo.get(ICredentialsMicroformat.VERB);
-			if (token.equals(IAuthMicroformat.AUTHENTICATE)) {
-				//CASE; user is authenticating, just pass through guest credentials
-			} else {
-				//TODO ?
-				//String userId = (String)jo.get(ICredentialsMicroformat.USER_NAME);
-				
-			}
 		}
 		result.setResultObject(t);
 		return result;

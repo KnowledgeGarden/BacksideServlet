@@ -13,6 +13,7 @@ import org.topicquests.common.ResultPojo;
 import org.topicquests.common.api.IResult;
 import org.topicquests.common.api.ITopicQuestsOntology;
 import org.topicquests.model.Node;
+import org.topicquests.model.TicketPojo;
 import org.topicquests.model.api.ITicket;
 import org.topicquests.model.api.node.INode;
 import org.topicquests.model.api.node.INodeModel;
@@ -28,6 +29,7 @@ public class TopicMapModel implements ITopicMapModel {
 	private JSONTopicmapEnvironment tmEnvironment;
 	private ITopicDataProvider topicMap;
 	private INodeModel nodeModel;
+	private ITicket systemCredentials;
 
 	/**
 	 * 
@@ -37,6 +39,7 @@ public class TopicMapModel implements ITopicMapModel {
 		tmEnvironment = environment.getTopicMapEnvironment();
 		topicMap = (ITopicDataProvider)tmEnvironment.getDataProvider();
 		nodeModel = topicMap.getNodeModel();
+		systemCredentials = new TicketPojo(ITopicQuestsOntology.SYSTEM_USER);
 	}
 
 	/* (non-Javadoc)
@@ -121,9 +124,13 @@ public class TopicMapModel implements ITopicMapModel {
 		if (isp.equalsIgnoreCase("t"))
 			isPrivate = true;
 		INode n = null;
-		if (locator != null)
+		if (locator != null) {
+			//First, see if this exists
+			IResult r = topicMap.getNode(locator, systemCredentials);
+			if (r.getResultObject() != null)
+				return r;
 			n = nodeModel.newInstanceNode(locator, typeLocator, label, description, lang, userId, smallImagePath, largeImagePath, isPrivate);
-		else 
+		} else 
 			n = nodeModel.newInstanceNode(typeLocator, label, description, lang, userId, smallImagePath, largeImagePath, isPrivate);
 		IResult result = topicMap.putNode(n, false);
 		result.setResultObject(n.getProperties());
@@ -145,9 +152,13 @@ public class TopicMapModel implements ITopicMapModel {
 		if (isp.equalsIgnoreCase("t"))
 			isPrivate = true;
 		INode n = null;
-		if (locator != null)
+		if (locator != null) {
+			//First, see if this exists
+			IResult r = topicMap.getNode(locator, systemCredentials);
+			if (r.getResultObject() != null)
+				return r;
 			n = nodeModel.newSubclassNode(locator, superClassLocator, label, description, lang, userId, smallImagePath, largeImagePath, isPrivate);
-		else
+		} else
 			n = nodeModel.newSubclassNode(superClassLocator, label, description, lang, userId, smallImagePath, largeImagePath, isPrivate);
 			
 		IResult result = topicMap.putNode(n, false);

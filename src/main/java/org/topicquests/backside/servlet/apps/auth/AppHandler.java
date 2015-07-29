@@ -45,9 +45,10 @@ public class AppHandler  extends BaseHandler {
 	//////////////////////////////////////////////
 	public void handleGet(HttpServletRequest request, HttpServletResponse response, ITicket credentials, JSONObject jsonObject) throws ServletException, IOException {
 		JSONObject returnMessage = newJSONObject();
-		System.out.println("AUTHPOST "+jsonObject.toJSONString());
+		System.out.println("AUTHGET "+jsonObject.toJSONString());
 		String message = "", rtoken="";
 		String verb = (String)jsonObject.get(ICredentialsMicroformat.VERB);
+		System.out.println("VERB "+verb);
 		int code = 0;
 		if (verb.equals(IAuthMicroformat.VALIDATE)) {
 			String name = (String)jsonObject.get(ICredentialsMicroformat.USER_NAME);
@@ -61,14 +62,15 @@ public class AppHandler  extends BaseHandler {
 				message = "not found";
 			}
 		} else if (verb.equals(IAuthMicroformat.AUTHENTICATE)) {
+			System.out.println("AUTH");
+			//We expect to see something like:
+			//{"verb":"Auth","uIP":"173.164.129.250","hash":"amFja3BhcmtAZ21haWwuY29tOmpiaW5reTQ0IQ=="}
 			String auth = (String)jsonObject.get("hash");//request.getHeader("Authorization");
 			System.out.println("AUTHORIZATION "+auth);
-			//auth = auth.substring("Basic".length()).trim();
-			System.out.println("AUTHORIZATION "+auth);
-			//AUTHORIZATION Basic c2FtQHNsb3cuY29tOnNhbSE=
-
+			String creds = "";
+			//This can hurl chunks
 			byte [] foo = BaseEncoding.base64().decode(auth);
-			String creds = new String(foo);
+			creds = new String(foo);
 			System.out.println("AUTHORIZATION2 "+creds);
 			//AUTHORIZATION2 foo:bar
 			int where = creds.indexOf(':');
@@ -89,6 +91,12 @@ public class AppHandler  extends BaseHandler {
 				code = BaseHandler.RESPONSE_NOT_FOUND;
 				message = r.getErrorString();
 			}
+		} else if (verb.equals(IAuthMicroformat.LOGOUT)) {
+			String token = (String)jsonObject.get(ICredentialsMicroformat.SESSION_TOKEN);
+			if (token != null)
+				credentialCache.removeTicket(token);
+			message = "ok";
+			code = BaseHandler.RESPONSE_OK;
 		} else {
 			String x = IErrorMessages.BAD_VERB+"-AuthServletPost-"+verb;
 			environment.logError(x, null);
@@ -97,7 +105,7 @@ public class AppHandler  extends BaseHandler {
 		
 		returnMessage.put(ICredentialsMicroformat.RESP_TOKEN, rtoken);
 		returnMessage.put(ICredentialsMicroformat.RESP_MESSAGE, message);
-		System.out.println("ADMINGET "+returnMessage.toJSONString());
+		System.out.println("AUTHGET "+returnMessage.toJSONString());
 		super.sendJSON(returnMessage.toJSONString(), code, response);
 		returnMessage = null;
 
