@@ -11,5 +11,6 @@ public interface IErrorMessages {
 	public static final String
 		TOKEN_NO_USER	= "TokenNoUser",
 		BAD_VERB		= "BadVerb",
-		MISSING_TOPIC	= "MissingTopic";
+		MISSING_TOPIC	= "MissingTopic",
+		MISSING_CARGO	= "MissingCargo";
 }

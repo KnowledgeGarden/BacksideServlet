@@ -20,11 +20,11 @@ import org.topicquests.backside.servlet.ServletEnvironment;
  */
 public class AdministratorServlet extends HttpServlet {
 	private ServletEnvironment environment;
-	private AppHandler handler;
+	private AdminHandler handler;
     
 	public AdministratorServlet(ServletEnvironment env, String basePath) {
 		environment = env;
-		handler = new AppHandler(environment,basePath);
+		handler = new AdminHandler(environment,basePath);
 	}
 		
 	

@@ -19,11 +19,11 @@ import org.topicquests.backside.servlet.ServletEnvironment;
  */
 public class UserServlet extends HttpServlet {
 	private ServletEnvironment environment;
-	private AppHandler handler;
+	private UserHandler handler;
     
 	public UserServlet(ServletEnvironment env, String basePath) {
 		environment = env;
-		handler = new AppHandler(environment,basePath);
+		handler = new UserHandler(environment,basePath);
 		environment.logDebug("UserServlet started");
 	}
 	

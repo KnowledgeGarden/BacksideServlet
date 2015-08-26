@@ -18,14 +18,14 @@ import org.topicquests.backside.servlet.ServletEnvironment;
  */
 public class TopicMapServlet extends HttpServlet {
 	private ServletEnvironment environment;
-	private AppHandler handler;
+	private TopicMapHandler handler;
 
 	/**
 	 * 
 	 */
 	public TopicMapServlet(ServletEnvironment env, String basePath) {
 		environment = env;
-		handler = new AppHandler(environment, basePath);
+		handler = new TopicMapHandler(environment, basePath);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

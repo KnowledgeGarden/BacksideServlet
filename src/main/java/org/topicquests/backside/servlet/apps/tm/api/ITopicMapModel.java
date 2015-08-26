@@ -50,11 +50,23 @@ public interface ITopicMapModel {
 	 * Allow for a simple shell topic, crafted at web clients, to be filled out to a full topic and persisted
 	 * and returned.
 	 * @param theTopicShell
+	 * @param credentials
 	 * @return returns the node's JSONObject
 	 */
-	IResult newInstanceNode(JSONObject theTopicShell);
+	IResult newInstanceNode(JSONObject theTopicShell, ITicket credentials);
 	
-	IResult newSubclassNode(JSONObject theTopicShell);
+	IResult newSubclassNode(JSONObject theTopicShell, ITicket credentials);
+	
+	/**
+	 * Cargo must include<br/>
+	 * <li>nodeLocator</li>
+	 * <li>property type-value(s) pair</li>
+	 * <li>userId</li>
+	 * @param cargo
+	 * @param credentials
+	 * @return
+	 */
+	IResult addFeaturesToNode(JSONObject cargo, ITicket credentials);
 	
     /**
      * List users in the TopicMap
