@@ -19,12 +19,12 @@ import org.topicquests.model.api.ITicket;
  * @author park
  *
  */
-public class AppHandler  extends BaseHandler {
+public class AdminHandler  extends BaseHandler {
 
 	/**
 	 * 
 	 */
-	public AppHandler(ServletEnvironment env, String basePath) {
+	public AdminHandler(ServletEnvironment env, String basePath) {
 		super(env, basePath);
 	}
 

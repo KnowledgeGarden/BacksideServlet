@@ -23,6 +23,7 @@ import org.topicquests.backside.servlet.apps.tm.api.ITopicMapMicroformat;
 import org.topicquests.backside.servlet.apps.tm.api.ITopicMapModel;
 import org.topicquests.backside.servlet.apps.usr.api.IUserMicroformat;
 import org.topicquests.common.api.IResult;
+import org.topicquests.common.api.ITopicQuestsOntology;
 import org.topicquests.model.api.ITicket;
 import org.topicquests.model.api.node.INode;
 
@@ -30,13 +31,13 @@ import org.topicquests.model.api.node.INode;
  * @author park
  *
  */
-public class AppHandler  extends BaseHandler {
+public class TopicMapHandler  extends BaseHandler {
 	private ITopicMapModel model;
 	
 	/**
 	 * 
 	 */
-	public AppHandler(ServletEnvironment env, String basePath) {
+	public TopicMapHandler(ServletEnvironment env, String basePath) {
 		super(env,basePath);
 		model = new TopicMapModel(environment);
 	}
@@ -96,6 +97,42 @@ public class AppHandler  extends BaseHandler {
 				message = "Not found";
 				code = BaseHandler.RESPONSE_NOT_FOUND;
 			}
+		} else if (verb.equals(ITopicMapMicroformat.LIST_INSTANCE_TOPICS)) { 
+			String startS = notNullString((String)jsonObject.get(ICredentialsMicroformat.ITEM_FROM));
+			String countS = notNullString((String)jsonObject.get(ICredentialsMicroformat.ITEM_COUNT));
+			String typeLocator = notNullString((String)jsonObject.get(ITopicQuestsOntology.INSTANCE_OF_PROPERTY_TYPE));
+			int start = 0, count = -1;
+			if (!startS.equals("")) {
+				try {
+					start = Integer.valueOf(startS);
+				} catch (Exception e1) {}
+			}
+			if (!countS.equals("")) {
+				try {
+					count = Integer.valueOf(countS);
+				} catch (Exception e2) {}
+			}
+			//TODO: note: we are ignoring any SORT modifiers
+			//This really returns some live cargo in the form of a list of user objects in JSON format
+			// We are restricting this to: name, email, avatar, homepage, geolocation, role
+			r = model.listInstanceTopics(typeLocator, start, count, credentials);
+			if (r.hasError()) {
+				code = BaseHandler.RESPONSE_INTERNAL_SERVER_ERROR;
+				message = r.getErrorString();
+			} else {
+				//Time to take that list apart
+				if (r.getResultObject() != null) {
+					List<INode> usrs = (List<INode>)r.getResultObject();
+					Iterator<INode>itr = usrs.iterator();
+					List<JSONObject>jsonUsers = new ArrayList<JSONObject>();
+					while (itr.hasNext()) {
+						jsonUsers.add((JSONObject)itr.next().getProperties());
+					}
+					returnMessage.put(ICredentialsMicroformat.CARGO, jsonUsers);
+				}
+				code = BaseHandler.RESPONSE_OK;
+				message = "ok";
+			}
 		}  else {
 			String x = IErrorMessages.BAD_VERB+"-UserServletGet-"+verb;
 			environment.logError(x, null);
@@ -110,6 +147,7 @@ public class AppHandler  extends BaseHandler {
 	
 	public void handlePost(HttpServletRequest request, HttpServletResponse response, ITicket credentials, JSONObject jsonObject) throws ServletException, IOException {
 		JSONObject returnMessage = newJSONObject();
+		JSONObject cargo = (JSONObject)jsonObject.get(ICredentialsMicroformat.CARGO);
 		String message = "", rtoken="";
 		String verb = (String)jsonObject.get(ICredentialsMicroformat.VERB);
 		int code = 0;
@@ -117,9 +155,9 @@ public class AppHandler  extends BaseHandler {
 		if (verb.equals(ITopicMapMicroformat.PUT_TOPIC)) {
 			//TODO
 		} else if (verb.equals(ITopicMapMicroformat.NEW_INSTANCE_TOPIC)) {
-			JSONObject theTopic = (JSONObject)jsonObject.get(ICredentialsMicroformat.CARGO);
-			if (theTopic != null) {
-				r = model.newInstanceNode(theTopic);
+			if (cargo != null) {
+				System.out.println("CARGO "+cargo.toJSONString());
+				r = model.newInstanceNode(cargo, credentials);
 				returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)r.getResultObject());
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
@@ -129,9 +167,8 @@ public class AppHandler  extends BaseHandler {
 				throw new ServletException(x);
 			}
 		} else if (verb.equals(ITopicMapMicroformat.NEW_SUBCLASS_TOPIC)) {
-			JSONObject theTopic = (JSONObject)jsonObject.get(ICredentialsMicroformat.CARGO);
-			if (theTopic != null) {
-				r = model.newSubclassNode(theTopic);
+			if (cargo != null) {
+				r = model.newSubclassNode(cargo, credentials);
 				returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)r.getResultObject());
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
@@ -142,7 +179,14 @@ public class AppHandler  extends BaseHandler {
 			}
 		} else if (verb.equals(ITopicMapMicroformat.REMOVE_TOPIC)) {
 			//TODO
-	//	} else if (verb.equals(ITopicMapMicroformat.PUT_TOPIC)) {
+		} else if (verb.equals(ITopicMapMicroformat.ADD_FEATURES_TO_TOPIC)) {
+			if (cargo != null) {
+				r = model.addFeaturesToNode(cargo, credentials);
+			} else {
+				String x = IErrorMessages.MISSING_CARGO+"-TMServletPost-"+verb;
+				environment.logError(x, null);
+				throw new ServletException(x);
+			}
 			
 			
 		} else {

@@ -29,15 +29,15 @@ import com.google.common.io.BaseEncoding;
  * @author park
  *
  */
-public class AppHandler  extends BaseHandler {
+public class UserHandler  extends BaseHandler {
 	//access to user database
 	private IUserModel model;
 	/**
 	 * 
 	 */
-	public AppHandler(ServletEnvironment env, String basePath) {
+	public UserHandler(ServletEnvironment env, String basePath) {
 		super(env,basePath);
-		System.out.println("User AppHandler");
+		System.out.println("User TopicMapHandler");
 		try {
 			model = new UserModel(environment);
 		} catch (Exception e) {
