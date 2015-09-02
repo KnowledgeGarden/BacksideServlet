@@ -65,31 +65,51 @@ public class AppHandler  extends BaseHandler {
 			System.out.println("AUTH");
 			//We expect to see something like:
 			//{"verb":"Auth","uIP":"173.164.129.250","hash":"amFja3BhcmtAZ21haWwuY29tOmpiaW5reTQ0IQ=="}
-			String auth = (String)jsonObject.get("hash");//request.getHeader("Authorization");
-			System.out.println("AUTHORIZATION "+auth);
-			String creds = "";
-			//This can hurl chunks
-			byte [] foo = BaseEncoding.base64().decode(auth);
-			creds = new String(foo);
-			System.out.println("AUTHORIZATION2 "+creds);
-			//AUTHORIZATION2 foo:bar
-			int where = creds.indexOf(':');
-			String email = creds.substring(0,where);
-			String pwd = creds.substring(where+1);
-			
-			System.out.println("LOGIN "+email+" "+pwd);
-			IResult r = model.authenticate(email, pwd);
-			System.out.println("LOGIN-1 "+r.getErrorString()+" | "+r.getResultObject());
-			ITicket t = (ITicket)r.getResultObject();
-			if (t != null) {
-				rtoken = newUUID();
-				returnMessage.put(ICredentialsMicroformat.CARGO, ticketToUser(t));
-				message = "ok";
-				code = BaseHandler.RESPONSE_OK;
-				credentialCache.putTicket(rtoken, t);
+			String auth = (String)jsonObject.get("hash");//
+			if (auth == null) {
+				//have to go looking for it.
+				auth = request.getHeader("Authorization");
+				if (auth == null)
+					auth = request.getHeader("auth"); // meteor apps do this
+			}
+			if (auth != null) {
+				System.out.println("AUTHORIZATION "+auth);
+				String creds = "";
+				// we do not know if it was Base64 encoded or not
+				if (auth.startsWith("Basic")) {
+					auth = auth.substring("Basic".length()).trim();
+				}
+				int where = auth.indexOf(':');
+				if (where == -1) {
+					System.out.println("AUTHORIZATION2 "+auth);
+					//This can hurl chunks
+					byte [] foo = BaseEncoding.base64().decode(auth);
+					creds = new String(foo);
+				} else {
+					creds = auth;
+				}
+				System.out.println("AUTHORIZATION3 "+creds);
+				//AUTHORIZATION2 foo:bar
+				where = creds.indexOf(':');
+				String email = creds.substring(0,where);
+				String pwd = creds.substring(where+1);
+				
+				System.out.println("LOGIN "+email+" "+pwd);
+				IResult r = model.authenticate(email, pwd);
+				System.out.println("LOGIN-1 "+r.getErrorString()+" | "+r.getResultObject());
+				ITicket t = (ITicket)r.getResultObject();
+				if (t != null) {
+					rtoken = newUUID();
+					returnMessage.put(ICredentialsMicroformat.CARGO, ticketToUser(t));
+					message = "ok";
+					code = BaseHandler.RESPONSE_OK;
+					credentialCache.putTicket(rtoken, t);
+				} else {
+					code = BaseHandler.RESPONSE_NOT_FOUND;
+					message = r.getErrorString();
+				}
 			} else {
-				code = BaseHandler.RESPONSE_NOT_FOUND;
-				message = r.getErrorString();
+				//missing auth
 			}
 		} else if (verb.equals(IAuthMicroformat.LOGOUT)) {
 			String token = (String)jsonObject.get(ICredentialsMicroformat.SESSION_TOKEN);

@@ -130,6 +130,13 @@ public class UserHandler  extends BaseHandler {
 				role = ISecurity.USER_ROLE; //default role
 			byte [] foo = BaseEncoding.base64().decode(password);
 			String creds = new String(foo);
+			//SANITY CHECK
+			if (userName == null || userName.equals("")) {
+				//Terrible way to handle errors
+				String x = IErrorMessages.BAD_VERB+"-UserServletPost-"+verb;
+				environment.logError(x, null);
+				throw new ServletException(x);
+			}
 			r = model.insertUser(email, userName, creds, fullName, avatar, role, homepage, geolocation, true);
 			System.out.println("NEWUSER2 "+r.getErrorString());
 			if (r.hasError()) {
@@ -143,6 +150,7 @@ public class UserHandler  extends BaseHandler {
 			returnMessage.put(ICredentialsMicroformat.RESP_TOKEN, rtoken);
 			returnMessage.put(ICredentialsMicroformat.RESP_MESSAGE, message);
 		} else {
+			//Terrible way to handle errors
 			String x = IErrorMessages.BAD_VERB+"-UserServletPost-"+verb;
 			environment.logError(x, null);
 			throw new ServletException(x);

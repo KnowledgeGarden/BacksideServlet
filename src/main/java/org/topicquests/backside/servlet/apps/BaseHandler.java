@@ -138,7 +138,7 @@ public abstract class BaseHandler {
 					//CASE: someone sent in a token, but we don't know who it is: big error
 					// could be that the same platform logged out before
 					environment.logError(x, null);
-					throw new ServletException(x);
+					result.addErrorString("No Token");
 				} 
 			} 
 		}
@@ -149,9 +149,19 @@ public abstract class BaseHandler {
 	
 	protected abstract void handlePost(HttpServletRequest request, HttpServletResponse response, ITicket credentials, JSONObject jsonObject) throws ServletException, IOException;
 	
+	protected void processError(String error, HttpServletResponse response) throws ServletException {
+		JSONObject returnMessage = newJSONObject();
+		returnMessage.put(ICredentialsMicroformat.RESP_TOKEN, "");
+		returnMessage.put(ICredentialsMicroformat.RESP_MESSAGE, error);
+		this.sendJSON(returnMessage.toJSONString(), BaseHandler.RESPONSE_AUTHENTICATION_REQUIRED, response);
+	}
 	
 	public void executeGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		IResult r = processRequest(request);
+		if (r.hasError()) {
+			processError(r.getErrorString(), response);
+			return;
+		}
 		ITicket t = (ITicket)r.getResultObject();
 		JSONObject jo = (JSONObject)r.getResultObjectA();
 		handleGet(request,response, t, jo);
@@ -162,6 +172,10 @@ public abstract class BaseHandler {
 	
 	public void executePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		IResult r = processRequest(request);
+		if (r.hasError()) {
+			processError(r.getErrorString(), response);
+			return;
+		}
 		ITicket t = (ITicket)r.getResultObject();
 		JSONObject jo = (JSONObject)r.getResultObjectA();
 		handlePost(request,response, t, jo);

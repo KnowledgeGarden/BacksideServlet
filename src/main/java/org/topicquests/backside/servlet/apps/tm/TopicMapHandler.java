@@ -86,7 +86,7 @@ public class TopicMapHandler  extends BaseHandler {
 		} else if (verb.equals(ITopicMapMicroformat.GET_TOPIC)) {
 			String locator = notNullString((String)jsonObject.get(ITopicMapMicroformat.TOPIC_LOCATOR));
 			r = model.getTopic(locator, credentials);
-			System.out.println("GETTOPIC "+r.getResultObject());
+			System.out.println("GETTOPIC "+locator+" | "+r.getResultObject());
 			if (r.getResultObject() != null) {
 				INode n = (INode)r.getResultObject();
 				System.out.println("GETTOPIC "+n);
