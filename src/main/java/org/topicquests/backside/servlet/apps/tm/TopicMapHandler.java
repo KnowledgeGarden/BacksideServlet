@@ -32,6 +32,7 @@ import org.topicquests.model.api.node.INode;
  *
  */
 public class TopicMapHandler  extends BaseHandler {
+	private static TopicMapHandler instance;
 	private ITopicMapModel model;
 	
 	/**
@@ -40,6 +41,15 @@ public class TopicMapHandler  extends BaseHandler {
 	public TopicMapHandler(ServletEnvironment env, String basePath) {
 		super(env,basePath);
 		model = new TopicMapModel(environment);
+		instance = this;
+	}
+	
+	/**
+	 * Handler is shared
+	 * @return
+	 */
+	public static TopicMapHandler getInstance() {
+		return instance;
 	}
 
 	public void handleGet(HttpServletRequest request, HttpServletResponse response, ITicket credentials, JSONObject jsonObject) throws ServletException, IOException {
@@ -79,14 +89,18 @@ public class TopicMapHandler  extends BaseHandler {
 						jsonUsers.add((JSONObject)itr.next().getProperties());
 					}
 					returnMessage.put(ICredentialsMicroformat.CARGO, jsonUsers);
+					code = BaseHandler.RESPONSE_OK;
+					message = "ok";
+				} else {
+					message = "Not found";
+					code = BaseHandler.RESPONSE_OK;
 				}
-				code = BaseHandler.RESPONSE_OK;
-				message = "ok";
+
 			}
 		} else if (verb.equals(ITopicMapMicroformat.GET_TOPIC)) {
 			String locator = notNullString((String)jsonObject.get(ITopicMapMicroformat.TOPIC_LOCATOR));
 			r = model.getTopic(locator, credentials);
-			System.out.println("GETTOPIC "+locator+" | "+r.getResultObject());
+			System.out.println("GETTOPIC "+r.getResultObject());
 			if (r.getResultObject() != null) {
 				INode n = (INode)r.getResultObject();
 				System.out.println("GETTOPIC "+n);
@@ -95,7 +109,7 @@ public class TopicMapHandler  extends BaseHandler {
 				message = "ok";
 			} else {
 				message = "Not found";
-				code = BaseHandler.RESPONSE_NOT_FOUND;
+				code = BaseHandler.RESPONSE_OK;
 			}
 		} else if (verb.equals(ITopicMapMicroformat.LIST_INSTANCE_TOPICS)) { 
 			String startS = notNullString((String)jsonObject.get(ICredentialsMicroformat.ITEM_FROM));
@@ -129,9 +143,33 @@ public class TopicMapHandler  extends BaseHandler {
 						jsonUsers.add((JSONObject)itr.next().getProperties());
 					}
 					returnMessage.put(ICredentialsMicroformat.CARGO, jsonUsers);
+					code = BaseHandler.RESPONSE_OK;
+					message = "ok";
+				} else {
+					message = "Not found";
+					code = BaseHandler.RESPONSE_OK;
 				}
-				code = BaseHandler.RESPONSE_OK;
-				message = "ok";
+
+			}
+		} else if (verb.equals(ITopicMapMicroformat.LIST_SUBCLASS_TOPICS)) { 
+			//TODO
+		} else if (verb.equals(ITopicMapMicroformat.LOAD_TREE)) {
+			//TODO
+		} else if (verb.equals(ITopicMapMicroformat.GET_TOPIC_BY_URL)) {
+			String url = (String)jsonObject.get(ITopicQuestsOntology.RESOURCE_URL_PROPERTY);
+			if (url != null) {
+				r = model.getTopicByURL(url, credentials);
+				if (r.getResultObject() != null) {
+					INode n = (INode)r.getResultObject();
+					System.out.println("GETTOPICBYURL "+n);
+					returnMessage.put(ICredentialsMicroformat.CARGO, (JSONObject)n.getProperties());
+					code = BaseHandler.RESPONSE_OK;
+					message = "ok";
+				} else {
+					message = "Not found";
+					code = BaseHandler.RESPONSE_OK;
+				}
+
 			}
 		}  else {
 			String x = IErrorMessages.BAD_VERB+"-UserServletGet-"+verb;
@@ -187,8 +225,35 @@ public class TopicMapHandler  extends BaseHandler {
 				environment.logError(x, null);
 				throw new ServletException(x);
 			}
+		} else if (verb.equals(ITopicMapMicroformat.FIND_OR_CREATE_BOOKMARK)) {
+			String url = notNullString((String)jsonObject.get(ITopicQuestsOntology.RESOURCE_URL_PROPERTY));
+			String title = notNullString((String)jsonObject.get(ITopicMapMicroformat.TOPIC_LABEL));
+			String language  = notNullString((String)jsonObject.get(ITopicMapMicroformat.LANGUAGE));
+			String userId  = notNullString((String)jsonObject.get(ICredentialsMicroformat.USER_NAME));
+			List<String> tagLabels = ((List<String>)jsonObject.get(ITopicMapMicroformat.LIST_PROPERTY));
+			r = model.findOrCreateBookmark(url, title, language, userId, tagLabels, credentials);
+			environment.logDebug("TopicMapHandler.FindOrCreateBookmark "+r.getErrorString()+" | "+r.getResultObject());
+			if (!r.hasError()) {
+				code = BaseHandler.RESPONSE_OK;
+				message = "ok";
+			} else {
+				message = r.getErrorString();
+				code = BaseHandler.RESPONSE_INTERNAL_SERVER_ERROR;
+			}
 			
-			
+		} else if (verb.equals(ITopicMapMicroformat.FIND_OR_PROCESS_TAG)) {
+			String bookmarkLocator = notNullString((String)jsonObject.get(ITopicQuestsOntology.LOCATOR_PROPERTY));
+			List<String> tagLabels = ((List<String>)jsonObject.get(ITopicMapMicroformat.LIST_PROPERTY));
+			String language  = notNullString((String)jsonObject.get(ITopicMapMicroformat.LANGUAGE));
+			r = model.findOrProcessTags(bookmarkLocator, tagLabels, language, credentials);
+			environment.logDebug("TopicMapHandler.FindOrProcessTag "+r.getErrorString()+" | "+r.getResultObject());
+			if (r.hasError()) {
+				message = r.getErrorString();
+				code = BaseHandler.RESPONSE_INTERNAL_SERVER_ERROR;
+			} else {
+				code = BaseHandler.RESPONSE_OK;
+				message = "ok";				
+			}	
 		} else {
 			String x = IErrorMessages.BAD_VERB+"-AdminServletPost-"+verb;
 			environment.logError(x, null);

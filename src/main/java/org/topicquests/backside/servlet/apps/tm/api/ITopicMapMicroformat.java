@@ -25,7 +25,16 @@ public interface ITopicMapMicroformat extends ICredentialsMicroformat {
 		NEW_SUBCLASS_TOPIC		= "NewSub",
 		//allows to add key/value pairs and special items
 		ADD_FEATURES_TO_TOPIC	= "AddFeatures",
-		LIST_INSTANCE_TOPICS	= "ListInstances";
+		LIST_INSTANCE_TOPICS	= "ListInstances",
+		LIST_SUBCLASS_TOPICS	= "ListSubclasses",
+		LOAD_TREE				= "LoadTree",
+		GET_TOPIC_BY_URL		= "GetByURL",
+		ADD_PIVOT				= "AddPivot",	//post
+		ADD_RELATION			= "AddRelation",	//post
+		FIND_OR_PROCESS_TAG		= "FindProcessTag", //post
+		FIND_OR_CREATE_BOOKMARK	= "FindProcessBookmark"; //post
+		
+		
 	
 	//attributes
 	public static final String
@@ -34,8 +43,10 @@ public interface ITopicMapMicroformat extends ICredentialsMicroformat {
 		PARENT_LOCATOR		= ITopicQuestsOntology.INSTANCE_OF_PROPERTY_TYPE,
 		TOPIC_LABEL			= ITopicQuestsOntology.LABEL_PROPERTY,
 		TOPIC_DETAILS		= ITopicQuestsOntology.DETAILS_PROPERTY,
+		LIST_PROPERTY		= "ListProperty",
 		//2-character code, e.g. "en"
 		LANGUAGE			= "Lang",
+		URL					= ITopicQuestsOntology.RESOURCE_URL_PROPERTY,
 		//nodes get images
 		LARGE_IMAGE_PATH	= ITopicQuestsOntology.LARGE_IMAGE_PATH,
 		SMALL_IMAGE_PATh	= ITopicQuestsOntology.SMALL_IMAGE_PATH,

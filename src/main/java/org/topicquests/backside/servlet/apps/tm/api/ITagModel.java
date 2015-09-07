@@ -3,6 +3,8 @@
  */
 package org.topicquests.backside.servlet.apps.tm.api;
 
+import java.util.List;
+
 import org.topicquests.common.api.IResult;
 import org.topicquests.model.api.ITicket;
 import org.topicquests.model.api.node.INode;
@@ -21,5 +23,5 @@ public interface ITagModel {
 	 * @param credentials
 	 * @return
 	 */
-	IResult addTagsToNode(INode node, String [] tagNames, ITicket credentials);
+	IResult addTagsToNode(INode node, List<String> tagNames, ITicket credentials);
 }

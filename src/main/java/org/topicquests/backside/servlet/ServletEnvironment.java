@@ -18,7 +18,8 @@ import org.topicquests.util.LoggingPlatform;
  *
  */
 public class ServletEnvironment {
-	private LoggingPlatform log = LoggingPlatform.getInstance("logger.properties");
+	private static ServletEnvironment instance;
+	private LoggingPlatform log=null;
 	private Map<String,Object>properties;
 	private StatisticsUtility stats;
 	private JSONTopicmapEnvironment tmEnvironment=null;
@@ -30,8 +31,10 @@ public class ServletEnvironment {
 	/**
 	 * @param isConsole <code>true</code> means boot JSONTopicMap console
 	 */
-	public ServletEnvironment(boolean isConsole) throws Exception {
-		System.out.println("ServletEnvironment-");
+	public ServletEnvironment(boolean isConsole) throws Exception { 
+		log = LoggingPlatform.getInstance("logger.properties"); 
+		System.out.println("xServletEnvironment- "+(log==null));
+		logDebug("xxServletEnvironment-");
 		ConfigPullParser p = new ConfigPullParser("config-props.xml");
 		properties = p.getProperties();
 		System.out.println("PROPS "+properties);
@@ -39,11 +42,22 @@ public class ServletEnvironment {
 		//TODO build topicmap
 		stats = new StatisticsUtility();
 		tmEnvironment = new JSONTopicmapEnvironment(stats);
+		System.out.println("STARTING USER");
 		userModel = new UserModel(this);
+		System.out.println("STARTED USER "+getStringProperty("ServerPort"));
+		//String urx = getStringProperty("ServerURL");
+		//int port = Integer.valueOf(getStringProperty("ServerPort")).intValue();
+		
 		isShutDown = false;
 		System.out.println("ServletEnvironment+");
+		instance = this;
+		logDebug("ServletEnvironment+");
 	}
 
+	public static ServletEnvironment getInstance() {
+		return instance;
+	}
+	
 	public IUserModel getUserModel() {
 		return userModel;
 	}

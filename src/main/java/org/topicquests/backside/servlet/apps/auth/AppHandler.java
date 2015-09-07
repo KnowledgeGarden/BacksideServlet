@@ -58,7 +58,7 @@ public class AppHandler  extends BaseHandler {
 				message = "ok";
 				code = BaseHandler.RESPONSE_OK;
 			} else {
-				code = BaseHandler.RESPONSE_NOT_FOUND;
+				code = BaseHandler.RESPONSE_OK;
 				message = "not found";
 			}
 		} else if (verb.equals(IAuthMicroformat.AUTHENTICATE)) {
@@ -105,11 +105,13 @@ public class AppHandler  extends BaseHandler {
 					code = BaseHandler.RESPONSE_OK;
 					credentialCache.putTicket(rtoken, t);
 				} else {
-					code = BaseHandler.RESPONSE_NOT_FOUND;
+					code = BaseHandler.RESPONSE_OK;
 					message = r.getErrorString();
 				}
 			} else {
 				//missing auth
+				System.out.println("WE ARE MISSING AUTH");
+				environment.logError("Auth AppHandler:WeAreMissingAuth", null);
 			}
 		} else if (verb.equals(IAuthMicroformat.LOGOUT)) {
 			String token = (String)jsonObject.get(ICredentialsMicroformat.SESSION_TOKEN);

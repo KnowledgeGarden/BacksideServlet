@@ -22,11 +22,13 @@ import org.topicquests.backside.servlet.apps.auth.AuthenticationServlet;
 import org.topicquests.backside.servlet.apps.base.BaseServlet;
 import org.topicquests.backside.servlet.apps.tm.TopicMapServlet;
 import org.topicquests.backside.servlet.apps.usr.UserServlet;
+import org.topicquests.util.LoggingPlatform;
 /**
  * @author park
  *
  */
 public class Main {
+	private LoggingPlatform log = LoggingPlatform.getInstance("logger.properties");
 	private ServletEnvironment environment;
 	
 	/**
@@ -40,7 +42,7 @@ public class Main {
 		if (args != null && args.length > 0) {
 			isConsole = args[0].equals("-UI");
 		}
-		
+		log.logDebug("MAIN.Booting");
 		//////////////////////
 		// Setup the environment
 		//////////////////////
@@ -52,14 +54,15 @@ public class Main {
 		File f = new File("");
 		String p = f.getAbsolutePath();
 		String basePath = p+"/webapps/ROOT/";
-		System.out.println("BASEPATH "+basePath);
+		environment.logDebug("MAIN.BASEPATH "+basePath);
 		//////////////////////
 		// Create the server
 		// ideas from http://stackoverflow.com/questions/28190198/cross-origin-filter-with-embedded-jetty
 		// and http://www.becodemonkey.com/?p=179
 		//////////////////////
-		Server server = new Server(8080);
-		
+		int port = Integer.valueOf(environment.getStringProperty("ServerPort")).intValue();
+		Server server = new Server(port);
+		environment.logDebug("MAIN.SERVER");
 		ServletHandler handler = new ServletHandler();
         FilterHolder holder = new FilterHolder(new CrossOriginFilter());
         holder.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
@@ -72,7 +75,8 @@ public class Main {
         fm.setFilterName("cross-origin");
         fm.setPathSpec("*");
         handler.addFilter(holder, fm );
-        
+        environment.logDebug("MAIN.HANDLER");
+      
 		ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.addFilter(holder, "/*", EnumSet.of(DispatcherType.REQUEST)); 
         context.setContextPath("/");
@@ -86,7 +90,7 @@ public class Main {
         context.addServlet(new ServletHolder(new AuthenticationServlet(environment, basePath)),"/auth/*");
         context.addServlet(new ServletHolder(new UserServlet(environment, basePath)),"/user/*");
         context.addServlet(new ServletHolder(new TopicMapServlet(environment, basePath)), "/tm/*");
-        
+              
         context.addServlet(new ServletHolder(new BaseServlet(environment, basePath)),"/*");
         
 
@@ -97,12 +101,17 @@ public class Main {
         //server.setHandler(handlers);  
         //TODO for some reason, the filterhandler blocked post
         server.setHandler(context);
+        environment.logDebug("MAIN.SERVLETS");
+
 		//////////////////////
 		// Start the server 
 		//////////////////////
         try {
+        	environment.logDebug("MAIN.START");
+
         	server.start();
         	server.join();
+
         } catch (Exception e) {
         	environment.logError(e.getMessage(), e);
         	e.printStackTrace();

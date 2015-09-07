@@ -3,6 +3,8 @@
  */
 package org.topicquests.backside.servlet.apps.tm.api;
 
+import java.util.List;
+
 import net.minidev.json.JSONObject;
 
 import org.topicquests.common.api.IResult;
@@ -36,6 +38,16 @@ public interface ITopicMapModel {
 	
 	IResult query(JSONObject query, int start, int count, ITicket credentials);
 	
+	/**
+	 * Note: a case could be made for 'listTopicsByURL' except that
+	 * URL in this case refers to a lone PropertyType; the assumption
+	 * is that, as a TopicMap, there can be one and only one topic
+	 * with that identity property.
+	 * @param url
+	 * @param credentials
+	 * @return
+	 */
+	IResult getTopicByURL(String url, ITicket credentials);
 	////////////////
 	// Specialized TopicMap handlers
 	////////////////
@@ -47,8 +59,9 @@ public interface ITopicMapModel {
 	IResult listTopicsByKeyValue(String propertyKey, String value, int start, int count, ITicket credentials);
 	
 	/**
-	 * Allow for a simple shell topic, crafted at web clients, to be filled out to a full topic and persisted
-	 * and returned.
+	 * <p>Allow for a simple shell topic, crafted at web clients, to be filled out to a full topic and persisted
+	 * and returned.</p>
+	 * <p>Also looks for a <em>url</em> property.
 	 * @param theTopicShell
 	 * @param credentials
 	 * @return returns the node's JSONObject
@@ -68,6 +81,37 @@ public interface ITopicMapModel {
 	 */
 	IResult addFeaturesToNode(JSONObject cargo, ITicket credentials);
 	
+	IResult addPivot(String topicLocator, String pivotLocator, String pivotRelationType,
+					 String smallImagePath, String largeImagePath, boolean isTransclude, boolean isPrivate, ITicket credentials);
+
+	IResult addRelation(String topicLocator, String pivotLocator, String pivotRelationType,
+			 String smallImagePath, String largeImagePath, boolean isTransclude, boolean isPrivate, ITicket credentials);
+
+	/**
+	 * <p>For a given <code>tabLabel</code><br/>
+	 *  1- See if tag exists.<br/>
+	 *  2- If not, create tag node and pivot to <code>userId</code><br/>
+	 *  3- Pivot to <code>bookmarkLocator</p>
+	 * @param bookmarkLocator
+	 * @param tagLabels
+	 * @param language 
+	 * @param credentials
+	 * @return
+	 */
+	IResult findOrProcessTags(String bookmarkLocator, List<String> tagLabels, String language, ITicket credentials);
+	
+	/**
+	 * Find bookmark node for <code>url</code> or otherwise make it and pivot to <code>userId</code>
+	 * @param url
+	 * @param title 
+	 * @param language 
+	 * @param userId
+	 * @param tagLabels can be <code>null</code>
+	 * @param credentials
+	 * @return
+	 */
+	IResult findOrCreateBookmark(String url, String title, String language, String userId, List<String> tagLabels, ITicket credentials);
+	
     /**
      * List users in the TopicMap
      * @param start
@@ -77,5 +121,7 @@ public interface ITopicMapModel {
      */
     IResult listUserTopics(int start, int count, ITicket credentials);
 
+    IResult getNodeTree(String rootLocator, int maxDepth, int start, int count, ITicket credentials);
+    
 	void shutDown();
 }

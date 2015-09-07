@@ -83,9 +83,12 @@ public class UserHandler  extends BaseHandler {
 						jsonUsers.add(ticketToUser(itr.next()));
 					}
 					returnMessage.put(ICredentialsMicroformat.CARGO, jsonUsers);
+					code = BaseHandler.RESPONSE_OK;
+					message = "ok";
+				} else {
+					message = "Not found";
+					code = BaseHandler.RESPONSE_OK;
 				}
-				code = BaseHandler.RESPONSE_OK;
-				message = "ok";
 			}
 		} else if (verb.equals(IUserMicroformat.GET_USER)) {
 			String email = notNullString((String)jsonObject.get(ICredentialsMicroformat.USER_EMAIL));
@@ -96,6 +99,9 @@ public class UserHandler  extends BaseHandler {
 				returnMessage.put(ICredentialsMicroformat.CARGO, jUser);
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
+			} else {
+				message = "Not found";
+				code = BaseHandler.RESPONSE_OK;
 			}
 		} else {
 			String x = IErrorMessages.BAD_VERB+"-UserServletGet-"+verb;
@@ -130,13 +136,6 @@ public class UserHandler  extends BaseHandler {
 				role = ISecurity.USER_ROLE; //default role
 			byte [] foo = BaseEncoding.base64().decode(password);
 			String creds = new String(foo);
-			//SANITY CHECK
-			if (userName == null || userName.equals("")) {
-				//Terrible way to handle errors
-				String x = IErrorMessages.BAD_VERB+"-UserServletPost-"+verb;
-				environment.logError(x, null);
-				throw new ServletException(x);
-			}
 			r = model.insertUser(email, userName, creds, fullName, avatar, role, homepage, geolocation, true);
 			System.out.println("NEWUSER2 "+r.getErrorString());
 			if (r.hasError()) {
@@ -150,7 +149,6 @@ public class UserHandler  extends BaseHandler {
 			returnMessage.put(ICredentialsMicroformat.RESP_TOKEN, rtoken);
 			returnMessage.put(ICredentialsMicroformat.RESP_MESSAGE, message);
 		} else {
-			//Terrible way to handle errors
 			String x = IErrorMessages.BAD_VERB+"-UserServletPost-"+verb;
 			environment.logError(x, null);
 			throw new ServletException(x);
