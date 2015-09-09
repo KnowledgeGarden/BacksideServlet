@@ -339,7 +339,9 @@ public class TopicMapModel implements ITopicMapModel {
 		IResult result = this.getTopicByURL(url, credentials);
 		INode bkmk = (INode)result.getResultObject();
 		System.out.println("FindOrCreateBookmark-1 "+bkmk);
+		boolean isNew = false;
 		if (bkmk == null) {
+			isNew = true;
 			//make a new one
 			JSONObject jo = new JSONObject();
 			jo.put(ITopicQuestsOntology.INSTANCE_OF_PROPERTY_TYPE, INodeTypes.BOOKMARK_TYPE);
@@ -352,6 +354,14 @@ public class TopicMapModel implements ITopicMapModel {
 			jo.put(ITopicMapMicroformat.LANGUAGE, language);
 			result = this.newInstanceNode(jo, credentials);
 			bkmk = (INode)result.getResultObject();
+		}
+		if (!isNew) {
+			List<String> pivs = bkmk.listPivotsByRelationType(ISocialBookmarkLegend.USER_BOOKMARK_RELATIONTYPE);
+			if(pivs.indexOf(userId)<0) {
+				IResult r = this.relateNodeToUser(bkmk, "BookmarkNodeType", userId, credentials);
+				if (r.hasError())
+					result.addErrorString(r.getErrorString());
+			}
 		}
 		System.out.println("FindOrCreateBookmark-2 "+bkmk+" "+tagLabels);
 		if (bkmk != null && tagLabels != null && tagLabels.size() > 0) {
