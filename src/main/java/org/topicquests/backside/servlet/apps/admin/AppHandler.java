@@ -97,7 +97,7 @@ public class AppHandler  extends BaseHandler {
 				code = BaseHandler.RESPONSE_OK;
 				message = "ok";
 			} else {
-				code = BaseHandler.RESPONSE_NOT_FOUND;
+				code = BaseHandler.RESPONSE_OK;
 				message = "not found";
 			}
 		} else if (verb.equals(IAdminMicroformat.LIST_INVITES)) {
